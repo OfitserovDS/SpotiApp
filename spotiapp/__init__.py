@@ -1,0 +1,2 @@
+"""SpotiApp package."""
+
