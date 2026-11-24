@@ -1,0 +1,13 @@
+.env
+data
+node_modules
+dist
+__pycache__
+**/__pycache__
+.venv
+venv
+.git
+.spotify_cache
+search_cache.json
+my_dj_music
+*.zip
