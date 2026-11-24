@@ -1,0 +1,33 @@
+x-app: &app
+  build: .
+  image: setcrate:local
+  restart: unless-stopped
+  volumes:
+    - setcrate-data:/data
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  init: true
+services:
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1:${SETCRATE_PORT:-8765}:8765"
+    environment:
+      SETCRATE_ORIGIN: "http://127.0.0.1:${SETCRATE_PORT:-8765}"
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SOUNDCLOUD_CLIENT_ID: ${SOUNDCLOUD_CLIENT_ID:-}
+      SOUNDCLOUD_CLIENT_SECRET: ${SOUNDCLOUD_CLIENT_SECRET:-}
+      JAMENDO_CLIENT_ID: ${JAMENDO_CLIENT_ID:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/api/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+  worker:
+    <<: *app
+    command: ["python", "-m", "setcrate.worker"]
+    network_mode: none
+volumes:
+  setcrate-data:
